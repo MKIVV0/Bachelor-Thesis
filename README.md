@@ -1,1 +1,1 @@
-# Bachelror-Thesis
+# Bachelor-Thesis
