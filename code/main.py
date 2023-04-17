@@ -71,7 +71,7 @@ def plot_histogram(mean, std, x_data):
     weights = np.ones_like(x_data) / len(x_data)
     # Plots the data
     plt.hist(x_data, weights=weights)
-    
+    plt.title("Gaussian fitting line")
     plt.xlabel("Data")
     plt.ylabel("Probability")
 
