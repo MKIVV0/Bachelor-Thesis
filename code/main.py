@@ -29,6 +29,8 @@ def plot_median_estimations(x, dset1, dset2, dset3=0):
     ax1.axhline(y=100000, color='r')
     ax1.axvline(x=0, color='r')
     ax1.grid()
+    ax1.set_ylabel("Generated data")
+    ax1.set_xlabel("# iterations")
     ax1.scatter(x, dset1)
 
     ax2.set_title("Epsilon median estimations")
@@ -36,6 +38,8 @@ def plot_median_estimations(x, dset1, dset2, dset3=0):
     ax2.axhline(y=100000, color='r')
     ax2.axvline(x=0, color='r')
     ax2.grid()
+    ax2.set_ylabel("Generated data")
+    ax2.set_xlabel("# iterations")
     ax2.scatter(x, dset2)
 
     ax3.set_title("Two-heaps median estimations")
@@ -43,44 +47,50 @@ def plot_median_estimations(x, dset1, dset2, dset3=0):
     ax3.axhline(y=100000, color='r')
     ax3.axvline(x=0, color='r')
     ax3.grid()
+    ax3.set_ylabel("Generated data")
+    ax3.set_xlabel("# iterations")
     ax3.scatter(x, dset2)
-    
-    
+
+
 def plot_histogram(mean, std, x_data):
     # Computes the histogram
-    hist, bin_edges = np.histogram(x_data) # outputs: values of the histogram, bin edges
-    hist=hist/sum(hist)
+    # outputs: values of the histogram, bin edges
+    hist, bin_edges = np.histogram(x_data)
+    hist = hist/sum(hist)
     n = len(hist)
-    
+
     # Extracts the x-axis (histogram bin) and y-axis (values)
-    x_hist = np.zeros((n),dtype=float) # returns an array filled with zeros of length n
+    # returns an array filled with zeros of length n
+    x_hist = np.zeros((n), dtype=float)
     for i in range(n):
         x_hist[i] = (bin_edges[i+1] + bin_edges[i])/2
     y_hist = hist
-    
+
     # Least-square fitting process on x_hist and y_hist
-    param_optimised,param_covariance_matrix = curve_fit(gaussian,x_hist,y_hist,p0=[max(y_hist),mean,std])
-    
+    param_optimised, param_covariance_matrix = curve_fit(
+        gaussian, x_hist, y_hist, p0=[max(y_hist), mean, std])
+
     # Plots the Gaussian curve
     fig = plt.figure(2)
-    x_hist_2 = np.linspace(np.min(x_hist),np.max(x_hist),500)
-    plt.plot(x_hist_2,gaussian(x_hist_2,*param_optimised),'r-',label='Gaussian fit') # Plots the fitting line
+    x_hist_2 = np.linspace(np.min(x_hist), np.max(x_hist), 500)
+    plt.plot(x_hist_2, gaussian(x_hist_2, *param_optimised),
+             'r-', label='Gaussian fit')  # Plots the fitting line
     plt.legend()
-    
+
     # Normalize the histogram values
     weights = np.ones_like(x_data) / len(x_data)
     # Plots the data
     plt.hist(x_data, weights=weights)
-    plt.title("Gaussian fitting line")
+    plt.suptitle("Generated data distribution")
     plt.xlabel("Data")
     plt.ylabel("Probability")
 
-    
+
 # a = 1 / sqrt(2pi)
 # b = x_0, e.g. (x - x_0)^2
 # c = 2std^2
-def gaussian(x, a, mean, sigma):
-    return a*np.exp(-(x - mean)**2/(2*sigma**2))
+def gaussian(x, a, mu, sigma):
+    return a*np.exp(-(x - mu)**2/(2*sigma**2))
 
 
 def main():
@@ -99,9 +109,8 @@ def main():
 
     # For two heaps median
     data_size = pow(10, 3)
-    x = np.arange(data_size) # number of iterations
-    
-    
+    x = np.arange(data_size)  # number of iterations
+
     for i in x:
         x_i = rnd.normalvariate(mean, std)
 
@@ -117,8 +126,8 @@ def main():
     # print("Medians:", std_medians)
 
     plot_median_estimations(x, std_medians, epsilon_medians)
-    #plot_histogram(mean, std, generated_nums, 25, 3, data_size)
-    #histogram(generated_nums, 25, mean, std)
+    # plot_histogram(mean, std, generated_nums, 25, 3, data_size)
+    # histogram(generated_nums, 25, mean, std)
     plot_histogram(mean, std, generated_nums)
     plt.show()
 
