@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random as rnd
 from scipy.optimize import curve_fit
+import TwoHeaps as th
 
 
 def epsilon_median(x_i, epsilon, index, actual_median):
@@ -107,6 +108,9 @@ def main():
     epsilon_medians = []
 
     # For two heaps median
+    two_heaps = th.TwoHeaps()
+    two_heaps_medians = []
+
     data_size = pow(10, 3)
     x = np.arange(data_size)  # number of iterations
 
@@ -121,10 +125,14 @@ def main():
         epsilon_x_i = epsilon_median(x_i, epsilon, i, epsilon_x_i)
         epsilon_medians.append(epsilon_x_i)
 
+        # Two-heaps median
+        two_heaps.insert(x_i)
+        two_heaps_medians.append(two_heaps.findMedian())
+
     # print("Generated nums:", generated_nums)
     # print("Medians:", std_medians)
 
-    plot_median_estimations(x, std_medians, epsilon_medians)
+    plot_median_estimations(x, std_medians, epsilon_medians, two_heaps_medians)
     # plot_histogram(mean, std, generated_nums, 25, 3, data_size)
     # histogram(generated_nums, 25, mean, std)
     plot_histogram(mean, std, generated_nums)
