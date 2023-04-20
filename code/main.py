@@ -18,7 +18,7 @@ def two_heaps_median():
     return
 
 
-def plot_median_estimations(x, dset1, dset2, dset3=0):
+def plot_median_estimations(x, dset1, dset2, dset3):
     # Plotting
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
     fig.suptitle('Median estimations over iterations')
@@ -49,7 +49,7 @@ def plot_median_estimations(x, dset1, dset2, dset3=0):
     ax3.grid()
     ax3.set_ylabel("Generated data")
     ax3.set_xlabel("# iterations")
-    ax3.scatter(x, dset2)
+    ax3.scatter(x, dset3)
 
 
 def plot_histogram(mean, std, x_data):
