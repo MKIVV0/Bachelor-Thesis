@@ -14,10 +14,6 @@ def epsilon_median(x_i, epsilon, index, actual_median):
     return actual_median
 
 
-def two_heaps_median():
-    return
-
-
 def plot_median_estimations(x, dset1, dset2, dset3):
     # Plotting
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
