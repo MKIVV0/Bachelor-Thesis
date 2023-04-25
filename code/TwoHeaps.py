@@ -35,7 +35,7 @@ class TwoHeaps:
     # For simplicity, the values inserted in the max heap are negative
     # When they're retrieved, the modulus operation is applied
     def insert(self, item):
-        if (len(self.maxHeap) == 0 or self.peek("max") >= item):
+        if (len(self.maxHeap) == 0 or -self.peek("max") >= item):
             hq.heappush(self.maxHeap, -item)
         else:
             hq.heappush(self.minHeap, item)
@@ -46,7 +46,6 @@ class TwoHeaps:
         elif ((len(self.minHeap) == 0) or (len(self.maxHeap) > len(self.minHeap))): return -self.peek("max")
         else: return (-self.peek("max") + self.peek("min"))/2 
     
-    # FOR DEBUGGING PURPOSES
     def printHeaps(self):
         print("MAX HEAP:\n")
         for i in self.maxHeap:
@@ -55,3 +54,5 @@ class TwoHeaps:
         print("\nMIN HEAP:")
         for i in self.minHeap:
             print(i)
+            
+        print("\nMAX HEAP: {}\nMIN HEAP: {}".format(len(self.maxHeap), len(self.minHeap)))

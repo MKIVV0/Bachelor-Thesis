@@ -15,7 +15,7 @@ def epsilon_median(x_i, epsilon, index, actual_median):
 
 
 def plot_median_estimations(x, dset1, dset2, dset3):
-    # Plotting
+   # Plotting
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
     fig.suptitle('Median estimations over iterations')
     fig.tight_layout(pad=3.0)
@@ -77,9 +77,9 @@ def plot_histogram(mean, std, x_data):
     weights = np.ones_like(x_data) / len(x_data)
     # Plots the data
     plt.hist(x_data, weights=weights)
-    plt.suptitle("Generated data distribution")
+    plt.suptitle("Generated data distribution: μ: {:.2f}; σ: {:.2f}".format(np.mean(x_data), np.std(x_data)))
     plt.xlabel("Data")
-    plt.ylabel("Probability")
+    plt.ylabel("Frequency")
 
 
 # a = 1 / sqrt(2pi)
