@@ -13,18 +13,19 @@ def epsilon_median(x_i, epsilon, index, actual_median):
         actual_median = actual_median + sign_num * epsilon
     return actual_median
 
-def update_ylabels(ax, mu, sigma):
-    ylabels = ['{}'.format('μ' if x == 100000 else str(round((x-mu)/sigma, 2)) + 'σ') for x in ax.get_yticks()]
+def update_ylabels(ax, mu, sigma, sigma_coeff):
+    ax.set_yticks(np.arange(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma+1, sigma))   # sets the range of the y-axis values
+    ylabels = ['{}'.format('μ' if np.ceil(x) == 100000 else str( np.ceil((x-mu)/sigma) ) + 'σ') for x in ax.get_yticks()]  # changes the labels given the condition inside the format
     ax.set_yticklabels(ylabels)
 
 def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
-    sigma_coeff = 3
+    sigma_coeff = 2
    # Plotting
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
     fig.suptitle('Median estimations over iterations\nμ: {}\nσ: {:.2f}'.format(mu, sigma))
     fig.tight_layout(pad=3.0)
 
-    ax1.set_title("Standard library median estimations")
+    ax1.set_title("Numpy library median estimations")
     ax1.grid()
     ax1.axhline(y=100000, color='r')
     ax1.axvline(x=0, color='r')
@@ -32,7 +33,7 @@ def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
     ax1.set_ylabel("Generated data")
     ax1.set_xlabel("# iterations")
     ax1.scatter(x, dset1)
-    update_ylabels(ax1, mu, sigma)
+    update_ylabels(ax1, mu, sigma, sigma_coeff)
 
     ax2.set_title("Epsilon median estimations")
     ax2.grid()
@@ -42,7 +43,7 @@ def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
     ax2.set_ylabel("Generated data")
     ax2.set_xlabel("# iterations")
     ax2.scatter(x, dset2)
-    update_ylabels(ax2, mu, sigma)
+    update_ylabels(ax2, mu, sigma, sigma_coeff)
 
     ax3.set_title("Two-heaps median estimations")
     ax3.grid()
@@ -52,7 +53,7 @@ def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
     ax3.set_ylabel("Generated data")
     ax3.set_xlabel("# iterations")
     ax3.scatter(x, dset3)
-    update_ylabels(ax3, mu, sigma)
+    update_ylabels(ax3, mu, sigma, sigma_coeff)
 
 
 def plot_histogram(mean, std, x_data):
