@@ -74,19 +74,23 @@ def plot_histogram(mean, std, x_data):
         gaussian, x_hist, y_hist, p0=[max(y_hist), mean, std])
 
     # Plots the Gaussian curve
-    fig = plt.figure(2)
+    fig, ax = plt.subplots()
     x_hist_2 = np.linspace(np.min(x_hist), np.max(x_hist), 500)
-    plt.plot(x_hist_2, gaussian(x_hist_2, *param_optimised),
+    ax.plot(x_hist_2, gaussian(x_hist_2, *param_optimised),
              'r-', label='Gaussian fit')  # Plots the fitting line
-    plt.legend()
+    ax.legend()
 
     # Normalize the histogram values
     weights = np.ones_like(x_data) / len(x_data)
     # Plots the data
-    plt.hist(x_data, weights=weights)
-    plt.suptitle("Generated data distribution: μ: {:.2f}; σ: {:.2f}".format(np.mean(x_data), np.std(x_data)))
-    plt.xlabel("Data")
-    plt.ylabel("Frequency")
+    ax.hist(x_data, weights=weights)
+    ax.set_title("Generated data distribution:\nμ: {:.2f}\nσ: {:.2f}".format(np.mean(x_data), np.std(x_data)))
+    ax.set_xlabel("Data")
+    ax.set_ylabel("Frequency")
+
+    # Converts probabilities back to frequencies
+    ylabels = ['{}'.format( int(x * len(x_data)) ) for x in ax.get_yticks()]
+    ax.set_yticklabels(ylabels)
 
 
 # a = 1 / sqrt(2pi)
