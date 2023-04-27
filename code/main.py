@@ -102,10 +102,16 @@ def plot_histogram(mean, std, x_data):
 # plots the trend of the ε-median algorithm for different epsilons
 def plot_epsmedians(x, epsilon_median_lists, espilonlist, mu, sigma, sigma_coeff):
     num_of_graphs = len(espilonlist)
+    first_half = int(num_of_graphs / 2)
+    second_half = num_of_graphs - first_half
 
-    fig, ax_i = plt.subplots(num_of_graphs, 1)
-    fig.suptitle("ε-median estimations for different ε")
-    fig.tight_layout(pad=4.0)
+    fig1, ax_i1 = plt.subplots(first_half, 1)
+    fig1.suptitle("ε-median estimations for different ε - 1st window")
+
+    fig2, ax_i2 = plt.subplots(second_half, 1)
+    fig2.suptitle("ε-median estimations for different ε - 2nd window")
+    
+    ax_i = np.append(ax_i1, ax_i2)
 
     for (graph, i) in zip(ax_i, range(len(espilonlist))):
             graph.set_title("ε = {}".format(espilonlist[i]))
@@ -114,9 +120,11 @@ def plot_epsmedians(x, epsilon_median_lists, espilonlist, mu, sigma, sigma_coeff
             graph.axvline(x=0, color='r')
             graph.set_ylim(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma)
             graph.set_ylabel("Estimated medians", rotation=90)
-            graph.set_xlabel("# iterations")
             graph.scatter(x, epsilon_median_lists[i])
             update_ylabels(graph, mu, sigma, sigma_coeff)
+
+    ax_i1[first_half-1].set_xlabel("# iterations")
+    ax_i2[second_half-1].set_xlabel("# iterations")
 
 
 # a = 1 / sqrt(2pi)
@@ -138,7 +146,7 @@ def main():
 
     # For ε-median algorithm
     #epsilon = 0.4
-    epsilon1 = [0.01, 0.4, 1, 10, 100]
+    epsilon1 = [0.01, 0.4, 0.5, 0.8, 1, 4, 10, 50, 100]
     epsilon_x_i = [0 for i in range(len(epsilon1))]  # this list keeps track of the median evolutions for each constant in epsilon1
     epsilon_medians = [[] for i in range(len(epsilon1))]  # a list of lists, where each sublists has 1000 median-estimations, for the purpose of plotting 
 
