@@ -104,13 +104,13 @@ def plot_epsmedians(x, epsilon_median_lists, espilonlist, mu, sigma, sigma_coeff
     num_of_graphs = len(espilonlist)
     first_half = int(num_of_graphs / 2)
     second_half = num_of_graphs - first_half
-
+    
     fig1, ax_i1 = plt.subplots(first_half, 1)
     fig1.suptitle("ε-median estimations for different ε - 1st window")
 
     fig2, ax_i2 = plt.subplots(second_half, 1)
     fig2.suptitle("ε-median estimations for different ε - 2nd window")
-    
+
     ax_i = np.append(ax_i1, ax_i2)
 
     for (graph, i) in zip(ax_i, range(len(espilonlist))):
@@ -123,6 +123,7 @@ def plot_epsmedians(x, epsilon_median_lists, espilonlist, mu, sigma, sigma_coeff
             graph.scatter(x, epsilon_median_lists[i])
             update_ylabels(graph, mu, sigma, sigma_coeff)
 
+    # The x label is set only in the last graph of each window, so that it doesn't overlap with the other graphs
     ax_i1[first_half-1].set_xlabel("# iterations")
     ax_i2[second_half-1].set_xlabel("# iterations")
 
