@@ -11,12 +11,14 @@ def epsilon_median(x_i, epsilon, index, actual_median):
     else:
         sign_num = np.sign(x_i - actual_median)
         actual_median = actual_median + sign_num * epsilon
-    return actual_median
+    return float(actual_median)
+
 
 def update_ylabels(ax, mu, sigma, sigma_coeff):
     ax.set_yticks(np.arange(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma+1, sigma))   # sets the range of the y-axis values
     ylabels = ['{}'.format('μ' if np.ceil(x) == 100000 else str( np.ceil((x-mu)/sigma) ) + 'σ') for x in ax.get_yticks()]  # changes the labels given the condition inside the format
     ax.set_yticklabels(ylabels)
+
 
 def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma, epsilon):
     sigma_coeff = 3
@@ -93,14 +95,24 @@ def plot_histogram(mean, std, x_data):
     ylabels = ['{}'.format( int(x * len(x_data)) ) for x in ax.get_yticks()]
     ax.set_yticklabels(ylabels)
 
-def plot_epsmedians(x, generated_nums, espilonlist):
+
+def plot_epsmedians(x, epsilon_median_lists, espilonlist, mu, sigma, sigma_coeff):
     num_of_graphs = len(espilonlist)
 
-    fig, ax_i = plt.subplot(num_of_graphs, 1)
+    fig, ax_i = plt.subplots(num_of_graphs, 1)
     fig.suptitle("ε-median estimations for different ε")
+    fig.tight_layout(pad=4.0)
 
-    for graph in ax_i:
-        graph.plot
+    for (graph, i) in zip(ax_i, range(len(espilonlist))):
+            graph.set_title("ε = {}".format(espilonlist[i]))
+            graph.grid()
+            graph.axhline(y=100000, color='r')
+            graph.axvline(x=0, color='r')
+            graph.set_ylim(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma)
+            graph.set_ylabel("Estimated medians", rotation=90)
+            graph.set_xlabel("# iterations")
+            graph.scatter(x, epsilon_median_lists[i])
+            update_ylabels(graph, mu, sigma, sigma_coeff)
 
 
 # a = 1 / sqrt(2pi)
@@ -120,10 +132,10 @@ def main():
     numpy_medians = []  # contains the list of medians
 
     # For epsilon median functions
-    epsilon = 0.4
-    epsilon1 = [0.01, 0.1, 0.4, 0.5, 1, 10, 100]
-    epsilon_x_i = 0
-    epsilon_medians = []
+    #epsilon = 0.4
+    epsilon1 = [0.01, 0.4, 1, 10, 100]
+    epsilon_x_i = [0 for i in range(len(epsilon1))]  # this list keeps track of the median evolutions for each constant in epsilon1
+    epsilon_medians = [[] for i in range(len(epsilon1))]  # a list of lists, where each sublists has 1000 median-estimations, for the purpose of plotting 
 
     # For two heaps median
     two_heaps = th.TwoHeaps()
@@ -140,8 +152,11 @@ def main():
         numpy_medians.append(np.median(generated_nums))
 
         # Epsilon median
-        epsilon_x_i = epsilon_median(x_i, epsilon, i, epsilon_x_i)
-        epsilon_medians.append(epsilon_x_i)
+        #epsilon_x_i = epsilon_median(x_i, epsilon, i, epsilon_x_i)
+        #epsilon_medians.append(epsilon_x_i)
+        for j in range(len(epsilon1)):
+            epsilon_x_i[j] = epsilon_median(x_i, epsilon1[j], i, epsilon_x_i[j])
+            epsilon_medians[j].append(epsilon_x_i[j])
 
         # Two-heaps median
         two_heaps.insert(x_i)
@@ -149,11 +164,15 @@ def main():
 
     # print("Generated nums:", generated_nums)
     # print("Medians:", std_medians)
+    # print("EPSILON MEDIAN LISTS:")
+    # for i in epsilon_medians:
+        #print(i)
 
-    plot_median_estimations(x, numpy_medians, epsilon_medians, two_heaps_medians, mean, std, epsilon)
+    plot_median_estimations(x, numpy_medians, epsilon_medians[1], two_heaps_medians, mean, std, epsilon1[1])
     # plot_histogram(mean, std, generated_nums, 25, 3, data_size)
     # histogram(generated_nums, 25, mean, std)
     plot_histogram(mean, std, generated_nums)
+    plot_epsmedians(x, epsilon_medians, epsilon1, mean, std, 2)
     plt.show()
 
 
