@@ -18,7 +18,7 @@ def update_ylabels(ax, mu, sigma, sigma_coeff):
     ylabels = ['{}'.format('μ' if np.ceil(x) == 100000 else str( np.ceil((x-mu)/sigma) ) + 'σ') for x in ax.get_yticks()]  # changes the labels given the condition inside the format
     ax.set_yticklabels(ylabels)
 
-def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
+def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma, epsilon):
     sigma_coeff = 3
    # Plotting
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1)
@@ -30,17 +30,17 @@ def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
     ax1.axhline(y=100000, color='r')
     ax1.axvline(x=0, color='r')
     ax1.set_ylim(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma)
-    ax1.set_ylabel("Generated data")
+    ax1.set_ylabel("Estimated medians")
     ax1.set_xlabel("# iterations")
     ax1.scatter(x, dset1)
     update_ylabels(ax1, mu, sigma, sigma_coeff)
 
-    ax2.set_title("Epsilon median estimations")
+    ax2.set_title("ε-median estimations (ε = {})".format(epsilon))
     ax2.grid()
     ax2.axhline(y=100000, color='r')
     ax2.axvline(x=0, color='r')
     ax2.set_ylim(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma)
-    ax2.set_ylabel("Generated data")
+    ax2.set_ylabel("Estimated medians")
     ax2.set_xlabel("# iterations")
     ax2.scatter(x, dset2)
     update_ylabels(ax2, mu, sigma, sigma_coeff)
@@ -50,7 +50,7 @@ def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma):
     ax3.axhline(y=100000, color='r')
     ax3.axvline(x=0, color='r')
     ax3.set_ylim(mu - sigma_coeff*sigma, mu + sigma_coeff*sigma)
-    ax3.set_ylabel("Generated data")
+    ax3.set_ylabel("Estimated medians")
     ax3.set_xlabel("# iterations")
     ax3.scatter(x, dset3)
     update_ylabels(ax3, mu, sigma, sigma_coeff)
@@ -93,6 +93,15 @@ def plot_histogram(mean, std, x_data):
     ylabels = ['{}'.format( int(x * len(x_data)) ) for x in ax.get_yticks()]
     ax.set_yticklabels(ylabels)
 
+def plot_epsmedians(x, generated_nums, espilonlist):
+    num_of_graphs = len(espilonlist)
+
+    fig, ax_i = plt.subplot(num_of_graphs, 1)
+    fig.suptitle("ε-median estimations for different ε")
+
+    for graph in ax_i:
+        graph.plot
+
 
 # a = 1 / sqrt(2pi)
 # b = x_0, e.g. (x - x_0)^2
@@ -112,6 +121,7 @@ def main():
 
     # For epsilon median functions
     epsilon = 0.4
+    epsilon1 = [0.01, 0.1, 0.4, 0.5, 1, 10, 100]
     epsilon_x_i = 0
     epsilon_medians = []
 
@@ -140,7 +150,7 @@ def main():
     # print("Generated nums:", generated_nums)
     # print("Medians:", std_medians)
 
-    plot_median_estimations(x, numpy_medians, epsilon_medians, two_heaps_medians, mean, std)
+    plot_median_estimations(x, numpy_medians, epsilon_medians, two_heaps_medians, mean, std, epsilon)
     # plot_histogram(mean, std, generated_nums, 25, 3, data_size)
     # histogram(generated_nums, 25, mean, std)
     plot_histogram(mean, std, generated_nums)
