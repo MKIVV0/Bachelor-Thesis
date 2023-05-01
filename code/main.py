@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import random as rnd
 from scipy.optimize import curve_fit
 import TwoHeaps as th
-from decimal import *
+import os
 
 # ε-median algorithm
 def epsilon_median(x_i, epsilon, index, actual_median):
@@ -148,7 +148,35 @@ def plot_epsmedians(x, epsilon_median_lists, epsilonlist, mu, sigma, sigma_coeff
 # c = 2std^2
 # Auxiliary function for finding the gaussian fitting-line on the histogram
 def gaussian(x, a, mu, sigma):
-    return float( a*np.exp(-(x - mu)**2/(2*sigma**2)) )
+    return a*np.exp(-(x - mu)**2/(2*sigma**2))
+
+
+# Reads the data from a given file - WORKING
+def read_from_file(filename='deviation_histogram_data'):
+    current_path_locator = '.' + os.sep
+    folder_name = 'data_folder' + os.sep
+
+    epsilon = 0
+    num_of_iterations = 0
+    list_of_values = []
+
+    with open(current_path_locator + folder_name + filename, 'r') as reader:
+        index = 0
+        for row in reader:
+            if index == 0: epsilon = float(row)
+            elif index == 1: num_of_iterations = int(row)
+            else: list_of_values.append(float(row))
+            index += 1      
+
+        reader.close()
+    
+    return epsilon, num_of_iterations, list_of_values
+
+
+# Uses the read_from_file function for plotting the deviation histogram
+def plot_deviation_histogram(epsilon):
+    epsilon, num_of_iteration, list_of_values = read_from_file()
+    return
 
 
 # MAIN FUNCTION
@@ -216,10 +244,11 @@ def main():
     plot_histogram(mean, std, generated_nums)
     epsilon_medians.append(generated_epsilon_medians)
     epsilon1.append(generated_epsilon)
-    print("TYPES:", type(epsilon_medians), " ", type(epsilon1))
     plot_epsmedians(x, epsilon_medians, epsilon1, mean, std, 2)
     plt.show()
-
+    
+    a, b, c = read_from_file("test")
+    print("TEST", a, b, c)
 
 if __name__ == '__main__':
     main()
