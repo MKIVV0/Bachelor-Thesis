@@ -152,31 +152,40 @@ def gaussian(x, a, mu, sigma):
 
 
 # Reads the data from a given file - WORKING
+'''
+Parameters meaning:
+epsilon = the constant of the epsilon-median algorithm, which will be displayed on the final histogram window
+num_of_iteration = the iteration at which to pick the data, which will be displayed on the final histogram window
+num_of_runs = the number of data-generation executions, which will be displayed on the final histogram window
+list_of_values = the values at the i-th iteration of all the executions, which are the values of the histogram
+'''
 def read_from_file(filename='deviation_histogram_data'):
     current_path_locator = '.' + os.sep
     folder_name = 'data_folder' + os.sep
 
     epsilon = 0
-    num_of_iterations = 0
+    num_of_iteration = 0
+    num_of_runs = 0
     list_of_values = []
 
     with open(current_path_locator + folder_name + filename, 'r') as reader:
         index = 0
         for row in reader:
             if index == 0: epsilon = float(row)
-            elif index == 1: num_of_iterations = int(row)
+            elif index == 1: num_of_runs = int(row)
+            elif index == 2: num_of_iteration = int(row)
             else: list_of_values.append(float(row))
             index += 1      
 
         reader.close()
     
-    return epsilon, num_of_iterations, list_of_values
+    return epsilon, num_of_runs, num_of_iteration, list_of_values
 
 
 # Uses the read_from_file function for plotting the deviation histogram
+# NOTE: display the mean and the std of the retrieved data
 def plot_deviation_histogram(epsilon):
-    epsilon, num_of_iteration, list_of_values = read_from_file()
-    return
+    epsilon, num_of_runs, num_of_iteration, list_of_values = read_from_file()
 
 
 # MAIN FUNCTION
@@ -247,8 +256,8 @@ def main():
     plot_epsmedians(x, epsilon_medians, epsilon1, mean, std, 2)
     plt.show()
     
-    a, b, c = read_from_file("test")
-    print("TEST", a, b, c)
+    a, b, c, d = read_from_file("test")
+    print("TEST", a, b, c, d)
 
 if __name__ == '__main__':
     main()
