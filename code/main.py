@@ -22,7 +22,7 @@ Then, we take the first generated value x_0 and multiply it by said k (k * |x_0|
 In the end, we just plug in the ε-median function.
 '''
 def get_epsilon(x_0, k):
-    return np.abs(x_0) / k
+    return float(np.abs(x_0) / k)
 
 
 # auxiliary method for renamig the y-axis into a standard deviation format
@@ -148,7 +148,7 @@ def plot_epsmedians(x, epsilon_median_lists, epsilonlist, mu, sigma, sigma_coeff
 # c = 2std^2
 # Auxiliary function for finding the gaussian fitting-line on the histogram
 def gaussian(x, a, mu, sigma):
-    return a*np.exp(-(x - mu)**2/(2*sigma**2))
+    return float( a*np.exp(-(x - mu)**2/(2*sigma**2)) )
 
 
 # MAIN FUNCTION
