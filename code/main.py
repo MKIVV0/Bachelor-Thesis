@@ -6,8 +6,6 @@ import TwoHeaps as th
 import time
 
 # ε-median algorithm
-
-
 def epsilon_median(x_i, epsilon, index, actual_median):
     if index == 0:
         actual_median = x_i
@@ -33,7 +31,7 @@ def update_ylabels(ax, mu, sigma, sigma_coeff):
     # sets the range of the y-axis values
     ax.set_yticks(np.arange(mu - sigma_coeff*sigma,
                   mu + sigma_coeff*sigma+1, sigma))
-    ylabels = ['{}'.format('μ' if np.ceil(x) == 100000 else str(np.ceil((x-mu)/sigma)) + 'σ')
+    ylabels = ['{:.3f}%'.format( np.abs(((x/mu) - 1) * 100) )
                for x in ax.get_yticks()]  # changes the labels given the condition inside the format
     ax.set_yticklabels(ylabels)
 
@@ -119,7 +117,7 @@ def plot_histogram(mean, std, x_data):
 
 
 # plots the trend of the ε-median algorithm for different epsilons
-def plot_epsmedians(x, epsilon_median_lists, epsilonlist, mu, sigma, sigma_coeff):
+def plot_epsmedians(x, epsilon_median_lists, epsilonlist, k, mu, sigma, sigma_coeff):
     num_of_graphs = len(epsilonlist)
     first_half = int(num_of_graphs / 2)
     second_half = num_of_graphs - first_half
@@ -133,11 +131,7 @@ def plot_epsmedians(x, epsilon_median_lists, epsilonlist, mu, sigma, sigma_coeff
     ax_i = np.append(ax_i1, ax_i2)
 
     for (graph, i) in zip(ax_i, range(len(epsilonlist))):
-        if i == (len(epsilonlist) - 1):
-            # THIS INDICATES THE ε estimated with the constant k and the value x_0
-            graph.set_title("NEW ε = {:.3f}".format(epsilonlist[i]))
-        else:
-            graph.set_title("ε = {}".format(epsilonlist[i]))
+        graph.set_title("k = {:.2e}   ε = {:.2f}".format(k[i], epsilonlist[i]))
 
         graph.grid()
         graph.axhline(y=100000, color='r')
@@ -243,17 +237,18 @@ def main():
 
     # ε-median algorithm SECTION
     # epsilon = 0.4
-    epsilon1 = [0.01, 0.5, 0.8, 1, 4, 10, 50, 100]
+    #epsilon1 = [0.01, 0.5, 0.8, 1, 4, 10, 50, 100]
     # this list keeps track of the median evolutions for each constant in epsilon1
-    epsilon_x_i = [0 for i in range(len(epsilon1))]
+    #epsilon_x_i = [0 for i in range(len(epsilon1))]
     # a list of lists, where each sublists has 1000 median-estimations, for the purpose of plotting
-    epsilon_medians = [[] for i in range(len(epsilon1))]
+    #epsilon_medians = [[] for i in range(len(epsilon1))]
 
     # GENERATED ε SECTION
-    k = 200000   # K CONSTANT FOR THE CALCULATION OF ε
-    generated_epsilon = 0
-    generated_epsilon_x_i = 0
-    generated_epsilon_medians = []
+    #k = 200000   # K CONSTANT FOR THE CALCULATION OF ε
+    k = [250, 500, 750, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 1e5]  # the arbitrary constants that serve for the calulation of ε
+    generated_epsilons = []  # stores the epsilon calculated with the different constants of the array above
+    generated_epsilon_x_i = [0 for i in range(len(k))] # this array serves for calculating the epsilon-medians, which are cumulative on the same variable
+    generated_epsilon_medians = [[] for i in range(len(k))]  # stores the trends for the various epsilons
 
     # two-heaps median algorithm SECTION
     two_heaps = th.TwoHeaps()
@@ -262,14 +257,15 @@ def main():
     data_size = pow(10, 3)
     x = np.arange(data_size)  # number of iterations
 
-    th_tmp_var = 0  # TMP VAR
+    th_tmp_var = 0  # TWO HEAPS TMP VAR
     delta_t_two_heaps = 0
 
     # Simulates a random data-flow
     for i in x:
         x_i = rnd.normalvariate(mean, std)
         if i == 0:
-            generated_epsilon = get_epsilon(x_i, k)
+            for constant in k:  # the epsilons for different ks are generated
+                generated_epsilons.append(get_epsilon(x_i, constant))  
 
         # Standard library median function
         generated_nums.append(x_i)
@@ -278,16 +274,28 @@ def main():
         # ε median
         # epsilon_x_i = epsilon_median(x_i, epsilon, i, epsilon_x_i)
         # epsilon_medians.append(epsilon_x_i)
-        for j in range(len(epsilon1)):
-            epsilon_x_i[j] = epsilon_median(
-                x_i, epsilon1[j], i, epsilon_x_i[j])
-            epsilon_medians[j].append(epsilon_x_i[j])
+        #for j in range(len(epsilon1)):
+        #    epsilon_x_i[j] = epsilon_median(
+        #        x_i, epsilon1[j], i, epsilon_x_i[j])
+        #   epsilon_medians[j].append(epsilon_x_i[j])
 
         # Generated ε
-        generated_epsilon_x_i = epsilon_median(
-            x_i, generated_epsilon, i, generated_epsilon_x_i)
-        generated_epsilon_medians.append(generated_epsilon_x_i)
+        '''
+        for epsilon, index in zip(generated_epsilons, range(len(generated_epsilons)) ):
+            actual_epsilon_median = epsilon_median(x_i, epsilon, i, actual_epsilon_median)
+            generated_epsilon_x_i[index] = actual_epsilon_median
+            generated_epsilon_medians[index].append(actual_epsilon_median)
+        '''
+        for j in range(len(generated_epsilons)):
+            generated_epsilon_x_i[j] = epsilon_median(x_i, generated_epsilons[j], i, generated_epsilon_x_i[j])
+            generated_epsilon_medians[j].append(generated_epsilon_x_i[j])    
 
+        '''
+        Here we calculate the execution time for retrieving the median
+        at the 10th iteration, including all the insertion needed beforehand.
+        The explaination continues below, on top of the line that prints 
+        "NUMPY VS TWO-HEAPS:"
+        '''
         # Two-heaps median
         # t1
         t1 = time.time()
@@ -300,17 +308,22 @@ def main():
         two_heaps_medians.append(two_heaps.findMedian())
 
     # This section represents the error histogram plot
-    plot_error_histograms(mean, std, generated_epsilon)
-    plot_median_estimations(
-        x, numpy_medians, epsilon_medians[1], two_heaps_medians, mean, std, epsilon1[1])
+    plot_error_histograms(mean, std, generated_epsilons[7])
+    plot_median_estimations(x, numpy_medians, generated_epsilon_medians[7], two_heaps_medians, mean, std, generated_epsilons[7])
     # plot_histogram(mean, std, generated_nums, 25, 3, data_size)
     # histogram(generated_nums, 25, mean, std)
     plot_histogram(mean, std, generated_nums)
-    epsilon_medians.append(generated_epsilon_medians)
-    epsilon1.append(generated_epsilon)
-    plot_epsmedians(x, epsilon_medians, epsilon1, mean, std, 2)
+    #epsilon_medians.append(generated_epsilon_medians)
+    #epsilon1.append(generated_epsilon)
+    plot_epsmedians(x, generated_epsilon_medians, generated_epsilons, k, mean, std, 2)
     plt.show()
 
+    ''' 
+    Test for veryfying the time it takes for both the numpy.median and 
+    the two heaps algorithm to retrieve the median.
+    DISCLAIMER: We suppose that the numpy.median function orders the array and 
+    takes the median value. 
+    '''
     print("NUMPY VS TWO-HEAPS:\n")
     t1 = time.time()
     print(np.sort(generated_nums[:10]))
