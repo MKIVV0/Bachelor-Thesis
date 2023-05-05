@@ -5,16 +5,6 @@ from scipy.optimize import curve_fit
 import TwoHeaps as th
 import time
 
-# ε-median algorithm
-def epsilon_median(x_i, epsilon, index, actual_median):
-    if index == 0:
-        actual_median = x_i
-    else:
-        sign_num = np.sign(x_i - actual_median)
-        actual_median = actual_median + sign_num * epsilon
-    return float(actual_median)
-
-
 '''
 We pretend we don't know the distribution parameters and set an arbitrary variable k, which
 is a positive decimal value (e.g. 5%, 10%). k is kept as such in order to investigate how the trend of
@@ -26,6 +16,14 @@ In the end, we just plug in the ε-median function.
 def get_epsilon(x_0, k): return float(np.abs(x_0) / k)
 
 
+# a = 1 / sqrt(2pi)
+# b = x_0, e.g. (x - x_0)^2
+# c = 2std^2
+# Auxiliary function for finding the gaussian fitting-line on the histogram
+def gaussian(x, a, mu, sigma):
+    return a*np.exp(-(x - mu)**2/(2*sigma**2))
+
+
 # auxiliary method for renamig the y-axis into a standard deviation format
 def update_ylabels(ax, mu, sigma, sigma_coeff):
     # sets the range of the y-axis values
@@ -34,6 +32,16 @@ def update_ylabels(ax, mu, sigma, sigma_coeff):
     ylabels = ['{:.3f}%'.format( np.abs(((x/mu) - 1) * 100) )
                for x in ax.get_yticks()]  # changes the labels given the condition inside the format
     ax.set_yticklabels(ylabels)
+
+
+# ε-median algorithm
+def epsilon_median(x_i, epsilon, index, actual_median):
+    if index == 0:
+        actual_median = x_i
+    else:
+        sign_num = np.sign(x_i - actual_median)
+        actual_median = actual_median + sign_num * epsilon
+    return float(actual_median)
 
 
 # plots the median estimations for the different algorithms
@@ -77,43 +85,33 @@ def plot_median_estimations(x, dset1, dset2, dset3, mu, sigma, epsilon):
 
 
 # plots the histogram of the random generated data
-def plot_histogram(mean, std, x_data):
-    # Computes the histogram
-    # outputs: values of the histogram, bin edges
-    hist, bin_edges = np.histogram(x_data)
-    hist = hist/sum(hist)
-    n = len(hist)
+def plot_histogram(data, title):
+    local_mean = np.mean(data)
+    local_std = np.std(data)
+    # values of the histogram, bin edges (len(hist)+1)
+    hist, bin_edges = np.histogram(data, 25)
+    # calculates the bin centers,by taking pairs, summing them and multiply them by .5
+    bin_centers = [.5 * (bin_edges[i] + bin_edges[i+1]) for i in range(len(bin_edges)-1)]
+    
+    # fitting curve function
+    popt, pcov = curve_fit(f=gaussian, xdata=bin_centers, ydata=hist, p0=[max(hist), local_mean, local_std])
+    print(popt, '\n', pcov)
 
-    # Extracts the x-axis (histogram bin) and y-axis (values)
-    # returns an array filled with zeros of length n
-    x_hist = np.zeros((n), dtype=float)
-    for i in range(n):
-        x_hist[i] = (bin_edges[i+1] + bin_edges[i])/2
-    y_hist = hist
-
-    # Least-square fitting process on x_hist and y_hist
-    param_optimised, param_covariance_matrix = curve_fit(
-        gaussian, x_hist, y_hist, p0=[max(y_hist), mean, std])
-
-    # Plots the Gaussian curve
-    fig, ax = plt.subplots()
-    x_hist_2 = np.linspace(np.min(x_hist), np.max(x_hist), 500)
-    ax.plot(x_hist_2, gaussian(x_hist_2, *param_optimised),
-            'r-', label='Gaussian fit')  # Plots the fitting line
-    ax.legend()
-
-    # Normalize the histogram values
-    weights = np.ones_like(x_data) / len(x_data)
-    # Plots the data
-    ax.hist(x_data, weights=weights)
-    ax.set_title("Generated data distribution:\nμ: {:.2f}\nσ: {:.2f}".format(
-        np.mean(x_data), np.std(x_data)))
+    fig, ax = plt.subplots(1, 1)
+    ax.set_title("{}:\nμ: {:.2f}\nσ: {:.2f}".format(
+        title, local_mean, local_std))
+    # plots the fitting line curve
+    ax.plot(bin_centers, gaussian(bin_centers, *popt), 'r', label='gaussian fit')
+    # plots the data histogram: we plot the pre-computed bins and hist by treating each bin
+    # as a single point with a weight equal to its count
+    ax.hist(x=bin_edges[:-1], bins=bin_edges, weights=hist, color='darkblue', label='data')
     ax.set_xlabel("Data")
     ax.set_ylabel("Frequency")
+    ax.legend()
 
     # Converts probabilities back to frequencies
-    ylabels = ['{}'.format(int(x * len(x_data))) for x in ax.get_yticks()]
-    ax.set_yticklabels(ylabels)
+    #ylabels = ['{}'.format(int(x * len(data))) for x in ax.get_yticks()]
+    #ax.set_yticklabels(ylabels)
 
 
 # plots the trend of the ε-median algorithm for different epsilons
@@ -146,17 +144,11 @@ def plot_epsmedians(x, epsilon_median_lists, epsilonlist, k, mu, sigma, sigma_co
     ax_i2[second_half-1].set_xlabel("# iterations")
 
 
-# a = 1 / sqrt(2pi)
-# b = x_0, e.g. (x - x_0)^2
-# c = 2std^2
-# Auxiliary function for finding the gaussian fitting-line on the histogram
-def gaussian(x, a, mu, sigma):
-    return a*np.exp(-(x - mu)**2/(2*sigma**2))
-
-
 # Represents ONE median-estimation trial
 # The object parameter is only used when a two-heaps algorithm is passed
 # The median_function parameter is used when only a function is needed for estimating the median
+# it returns the i-th value for each algorithm run
+
 def get_ith_iteration(mean, std, num_of_iteration, median_function1, median_function2, epsilon):
     x_i = 0
     tmp_trial_median1 = 0
@@ -180,10 +172,6 @@ def get_ith_iteration(mean, std, num_of_iteration, median_function1, median_func
     return float(tmp_trial_median1), float(tmp_trial_median2), float(tmp_trial_median3)
 
 
-def convert_to_percentage_format(mean, x):
-    return mean * x / 100
-
-
 def plot_error_histograms(mean, std, epsilon):
     num_of_trials = 1000
     ith_values1 = []  # error values for numpy.median
@@ -202,25 +190,31 @@ def plot_error_histograms(mean, std, epsilon):
     print(ith_values2[0:10])
     print(ith_values3[0:10])
 
-    def lambda_x(x): return (x/mean) - 1
-    ith_values1 = list(map(lambda_x, ith_values1))
-    ith_values2 = list(map(lambda_x, ith_values2))
-    ith_values3 = list(map(lambda_x, ith_values3))
+    def to_percent_format(x): return (x/mean) - 1
+    ith_values1 = list(map(to_percent_format, ith_values1))
+    ith_values2 = list(map(to_percent_format, ith_values2))
+    ith_values3 = list(map(to_percent_format, ith_values3))
 
-    plt.figure("Numpy.median error histogram")
-    plt.title("mean: {:e}\nstd: {:e}".format(
-        np.mean(ith_values1), np.std(ith_values1)))
-    plt.hist(ith_values1)
+    fig, ax_i = plt.subplots(1, 3)
+    fig.tight_layout(pad=2.5)
+    fig.suptitle("Percentage deviation with ε = {:.3f}".format(epsilon))
 
-    plt.figure("Epsilon-median error histogram")
-    plt.title("mean: {:e}\nstd: {:e}".format(
-        np.mean(ith_values2), np.std(ith_values2)))
-    plt.hist(ith_values2)
+    for ax in ax_i:
+        ax.title.set_text("Numpy.median error histogram")
+        ax.set_title("mean: {:e}\nstd: {:e}".format(
+            np.mean(ith_values1), np.std(ith_values1)))
+        ax.hist(ith_values1, color='darkblue')
 
-    plt.figure("Two-heaps median error histogram")
-    plt.title("mean: {:e}\nstd: {:e}".format(
-        np.mean(ith_values3), np.std(ith_values3)))
-    plt.hist(ith_values3)
+        ax.title.set_text("Epsilon-median error histogram")
+        ax.set_title("mean: {:e}\nstd: {:e}".format(
+            np.mean(ith_values2), np.std(ith_values2)))
+        ax.hist(ith_values2, color='darkblue')
+
+        ax.title.set_text("Two-heaps median error histogram")
+        ax.set_title("mean: {:e}\nstd: {:e}".format(
+            np.mean(ith_values3), np.std(ith_values3)))
+        ax.hist(ith_values3, color='darkblue')
+
 
 
 # MAIN FUNCTION
@@ -306,13 +300,16 @@ def main():
         if i == 9:
             th_tmp_var = two_heaps.findMedian()
         two_heaps_medians.append(two_heaps.findMedian())
+        
+        
 
     # This section represents the error histogram plot
-    plot_error_histograms(mean, std, generated_epsilons[7])
+    for eps in generated_epsilons:
+        plot_error_histograms(mean, std, eps)
     plot_median_estimations(x, numpy_medians, generated_epsilon_medians[7], two_heaps_medians, mean, std, generated_epsilons[7])
     # plot_histogram(mean, std, generated_nums, 25, 3, data_size)
     # histogram(generated_nums, 25, mean, std)
-    plot_histogram(mean, std, generated_nums)
+    plot_histogram(generated_nums, "Generated data distribution")
     #epsilon_medians.append(generated_epsilon_medians)
     #epsilon1.append(generated_epsilon)
     plot_epsmedians(x, generated_epsilon_medians, generated_epsilons, k, mean, std, 2)
