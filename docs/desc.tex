@@ -1,0 +1,103 @@
+\documentclass[paper=a4wide, fontsize=12pt]{scrartcl}	 % A4 paper and 11pt font size
+\usepackage[svgnames]{xcolor} % Using colors
+%%\usepackage{background} % To include background images
+\usepackage{fancyhdr} % Needed to define custom headers/footers
+\usepackage[a4paper, left=20mm, right=20mm, top=20mm, bottom=2.5cm, footskip=1.2cm]{geometry}  % Changing size of document
+
+
+\usepackage{braket}
+
+
+\pagestyle{fancy} % Enables the custom headers/footers
+\lfoot{\color{Grey} Zhang Ying Huang}  % Write your name here
+\rfoot{\color{Grey} Università degli studi dell'Insubria}
+\cfoot{\color{Grey} \thepage}
+\renewcommand{\headrulewidth}{0.0pt} % No header rule
+\renewcommand{\footrulewidth}{0.4pt} % Thin footer rule
+
+\title{ \color{DarkRed}Thesis work: comparing three algorithms for the median estimation on a random stream of data\vspace{-1.5em}}
+\date{} % No date
+
+
+%%%%%% Starting the document
+
+\begin{document}
+
+\maketitle % Print the title
+\thispagestyle{fancy} % Enabling the custom headers/footers for the first page
+
+
+% In the following lines, add the relevant information
+\vspace{-0.5cm} \textbf{Student Name: Zhang Ying (Matteo) Huang}
+
+\textbf{Student ID: 756483}
+
+\textbf{Version: 1.0}
+
+\vspace{0.5cm}
+
+\section*{The idea behind the work}
+
+What we want to investigate during this work is how three algorithms compare in the median estimation process on a stream of data.
+The three algorithms considered are the following:
+\begin{itemize}
+    \item numpy.median();
+    \item two-heaps median;
+    \item $\mathbf{\varepsilon}$-median.
+\end{itemize}
+The parameters taken into consideration for comparing these algorithms are time-complexity and space-complexity.
+A description for each algorithm follows.
+
+\section*{Numpy.median()}
+%%%% TO DO - STUDY THE IMPLEMENTATION BEHIND
+
+\section*{Two-heaps median}
+Assuming that one knows the heap data-structure, this algorithm, as the name suggests, is based on two heaps, specifically on a max-heap and on a min-heap. \\
+Taking as example a finite array A = \{1, 2, 3, 4, 5\} (the same concept applies to a stream of data), the max-heap will contain the lower-half of the array, while the min-heap will contain the upper-half. \\
+Right after each insertion, the balance condition is checked, for which either of the following condition must be true:
+\begin{itemize}
+    \item the max heap can have, at most, one more element than the min-heap;
+    \item both heaps have the same number of elements.
+\end{itemize}
+
+If none of the previously stated condition is met, a balancing operation is carried out.
+Let's consider the following cases:
+\begin{itemize}
+    \item the max-heap has two more elements than the min-heap: the root of the max-heap is popped and inserted into the min-heap; 
+    \item the min-heap has one more element than the max-heap: the root of the min-heap is popped and inserted into the max-heap.
+\end{itemize} 
+
+The composite operation pop+insertion is called "poll".
+
+Taking the previously-declared array A, we will have the following situation (the following arrays are heap-ordered):
+\begin{itemize}
+    \item max-heap = \{3, 1, 2\}
+    \item min-heap = \{4, 5\} 
+\end{itemize}
+At this point, if we want to estimate the median, the algorithm just takes the root of the max-heap and return it as the output (3, in our case). \\
+Suppose we want to insert another number, say 6 for simplicity. What happens is the element is compared to the root of the max-heap and, if the value of the element we want to insert is less or equal than the considered root, we insert it into the max-heap, otherwise, we insert it into the min-heap. \\
+So, 6 is first compared to the max-heap root and, since it's a greater value, it's directly inserted into the min-heap: 
+\begin{itemize}
+    \item max-heap = \{3, 1, 2\}
+    \item min-heap = \{4, 5, 6\} 
+\end{itemize}
+
+Now we have an even number of elements spread across the two heaps. Say we want to estimate the median and what happens is that the root of both heaps are taken, then the mean value of the two elements is computed and returned as output (in our case, (4+3)/2 = 3.5).
+\\
+Now let's discuss complexity:\\
+Being N the number of elements, the space-complexity is, obviously, $\mathcal{O}(N)$ 
+While, talking about time-complexity, we have to consider each operation separately first:
+\begin{itemize}
+    \item insertion of an element: given that the underlying data-structure is a heap, we have a time complexity of $\mathcal{O}(\log N)$ for a single insertion. Since we have two heaps, there's a multiplicative constant of 2, taking the complexity up to $\mathcal{O}(2\log N)$.\\
+    Extending this operation to N elements, we will have a final time-complexity of $\mathcal{O}(2N\log N)$;
+    \item balancing: considering this operation relies on the heap-push operation and that the two heaps are involved most of the times, the time-complexity is $\mathcal{O}(2\log N)$;
+    \item polling: this operation takes $\mathcal{O}(\log N)$ in time, since it relies on the heap-pop operation. Specifically, it takes $\mathcal{O}(1)$ for retrieving the root and $\mathcal{O}(\log N)$ for re-balancing the heap;
+    \item peeking: this only takes $\mathcal{O}(1)$.
+\end{itemize}
+Considering the case of a random stream of data, we can expect the algorithm to run with the following time-complexity: N * ($2\log N + 2\log N + \log N$) = $\Theta(5N\log N)$.
+
+\section*{$\mathbf{\varepsilon}$-median}
+
+\section*{Comparing the three algorithms}
+
+\end{document}
