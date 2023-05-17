@@ -158,7 +158,7 @@ def main():
             th_tmp_var = two_heaps.findMedian()
         two_heaps_medians.append(two_heaps.findMedian())
         
-    write_to_file(generated_epsilons) # writes to a file the generated epsilon constants    
+    write_to_file(str(i)+'#'+str(j) for i, j in zip(generated_epsilons, k)) # writes to a file the generated epsilon constants    
 
     # DISCLAIMER: the meain and the standard deviation are still known here!
     plot_median_estimations(x, numpy_medians, generated_epsilon_medians[7], two_heaps_medians, mean, std, generated_epsilons[7])
