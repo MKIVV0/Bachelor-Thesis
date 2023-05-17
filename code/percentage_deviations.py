@@ -1,4 +1,4 @@
-from misc import plot_histogram, epsilon_median, read_from_file, write_to_file
+from misc import plot_histogram, epsilon_median, read_from_file
 from numpy import median as numpy_median, sqrt, mean, std
 import TwoHeaps as th
 import random as rnd
