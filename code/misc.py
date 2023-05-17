@@ -32,7 +32,7 @@ def write_to_file(list_of_values: list[float], filename='generated_epsilons'):
     if path.exists(full_path):
         remove(full_path)
     
-    with open(full_path, 'w') as f:
+    with open(full_path, 'a') as f:
         for value in list_of_values:
             f.write(str(value) + '\n')
     
@@ -47,7 +47,7 @@ def read_from_file(filename='generated_epsilons'):
 
     with open(path_locator + folder_name + filename, 'r') as reader:
         for row in reader:
-            list_of_values.append(float(row))   
+            list_of_values.append(row)   
 
         reader.close()
 
