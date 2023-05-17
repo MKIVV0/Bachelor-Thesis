@@ -37,7 +37,6 @@
 \vspace{0.5cm}
 
 \section*{The idea behind the work}
-
 What we want to investigate during this work is how three algorithms compare in the median estimation process on a stream of data.
 The three algorithms considered are the following:
 \begin{itemize}
@@ -47,9 +46,50 @@ The three algorithms considered are the following:
 \end{itemize}
 The parameters taken into consideration for comparing these algorithms are time-complexity and space-complexity.
 A description for each algorithm follows.
+%%to be revised
+%% END OF SECTION
+
 
 \section*{Numpy.median()}
-%%%% TO DO - STUDY THE IMPLEMENTATION BEHIND
+%%%% TO DO - STUDY THE IMPLEMENTATION BEHIND THE ALGORITHM
+%% END OF SECTION
+
+
+\section*{A quick introduction to the heap data structure}
+Before talking about the two-heaps, let's introduce the heap quickly.
+So, what is a heap? \\ 
+A heap is a tree-based data structure, which is binary and balanced. \\
+The main operations we can perform are:
+\begin{itemize}
+    \item insertion: inserts the given element as a leaf and is then ordered accordingly;
+    \item deletion: deletes the root element from the data structure, by swapping its value with the rightmost element, then an ordering process follows;
+    \item peeking: returns the root value.
+\end{itemize}
+
+The first two operations rely on the following sub-operations (for simplicity, we suppose that each internal node, root included, has elements with a lesser value as children):
+\begin{itemize}
+    \item swim: after an insertion, if the order condition is broken, the inserted element climbs up the tree until it's positioned correctly according to the heap order property, which will be discussed later;
+    \item sink: after the deletion, since the smallest element is at the top, the order condition is broken, therefore it has to go down the nodes until the right position is reached.
+\end{itemize}
+%%to be revised
+%% END OF SECTION
+
+
+\section*{Heap properties}
+There are two types of heaps:
+\begin{itemize}
+    \item the max-heap: each internal node, root included, has smaller children;
+    \item the min-heap: each internal node, root included, has bigger children.
+\end{itemize}
+
+The heap is usually represented as an array and, supposing that the first index is 1, each element at position i has, as children, the elements at position 2i and 2i+1.\\
+The children don't need to follow any particular order criteria, as long as they're both bigger or smaller than the parent node. \\
+
+As for the computational complexity, space-wise, it's $\mathcal{O}(N)$, while, time-wise, it's $\mathcal{O}(log N)$ for both insertion and deletion, and $\mathcal{O}(1)$ for peeking.\\
+In this context, the deletion is not needed, as we suppose the data flow is continuous and the two-heap data structure grows accordingly.
+%%to be revised
+%% END OF SECTION
+
 
 \section*{Two-heaps median}
 Assuming that one knows the heap data-structure, this algorithm, as the name suggests, is based on two heaps, specifically on a max-heap and on a min-heap. \\
@@ -84,7 +124,7 @@ So, 6 is first compared to the max-heap root and, since it's a greater value, it
 
 Now we have an even number of elements spread across the two heaps. Say we want to estimate the median and what happens is that the root of both heaps are taken, then the mean value of the two elements is computed and returned as output (in our case, (4+3)/2 = 3.5).
 \\
-Now let's discuss complexity:\\
+Now, let's discuss complexity:\\
 Being N the number of elements, the space-complexity is, obviously, $\mathcal{O}(N)$ 
 While, talking about time-complexity, we have to consider each operation separately first:
 \begin{itemize}
@@ -95,9 +135,37 @@ While, talking about time-complexity, we have to consider each operation separat
     \item peeking: this only takes $\mathcal{O}(1)$.
 \end{itemize}
 Considering the case of a random stream of data, we can expect the algorithm to run with the following time-complexity: N * ($2\log N + 2\log N + \log N$) = $\Theta(5N\log N)$.
+%% END OF SECTION
+%%to be revised
+
+
+\section*{The importance of the balancing operation in the two-heaps}
+%% also talk about the importance of not deleting the elements at a certain delta-t
+%% add demostration with images
+%% END OF SECTION
+
 
 \section*{$\mathbf{\varepsilon}$-median}
+%% to do
+%% END OF SECTION
+
 
 \section*{Comparing the three algorithms}
+%% to do
+%% END OF SECTION
 
+
+\section*{Investigating the behavior of $\mathbf{\varepsilon}$ by varying the constant k}
+We set the $\mathbf{\varepsilon}$ value to be dependent from two parameters: the first generated value $x_0$ and an arbitrary large constant k.
+In order to see which value to take for $\mathbf{\varepsilon}$, we investigate how it's affected from the choice of k, by taking 10 different values (250, 500, 750, $10^3$, $2*10^3$, $5*10^3$, $10^4$, $2*10^4$, $5*10^4$, $10^5$). %%to be continued
+%% END OF SECTION
+
+
+\section*{Percentage deviation plots}
+Here we want to consider N = 1000 median-estimation trials, fix an iteration number i (let's say 800), and take the i-th value $x_i$ in every trial; all the other data are thrown away.
+Then we want to take the residuals by applying the formula $\frac{x_i}{\mu} - 1$ (we scale the values to a percentage format). 
+Each trial has a generation step of 1000 data points, so we end up having $10^6$ operations.\\
+This process is applied to all three algorithms, and, in the $\mathbf{\varepsilon}$-median case, we consider all the k values that influence the computation of the parameter $\mathbf{\varepsilon}$.
+%%to be continued
+%% END OF SECTION
 \end{document}
