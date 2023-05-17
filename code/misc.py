@@ -63,7 +63,7 @@ def gaussian(x, a, mu, sigma):
 
 
 # plots the histogram of the random generated data
-def plot_histogram(data, title, mu=None, sigma=None):
+def plot_histogram(data, title, mu=None, sigma=None, format='normal'):
     # These parameters are needed for making the gaussian fit
     local_mean = mean(data)
     local_std = std(data)
@@ -89,7 +89,8 @@ def plot_histogram(data, title, mu=None, sigma=None):
     # plots the data histogram: we plot the pre-computed bins and hist by treating each bin
     # as a single point with a weight equal to its count
     ax.hist(x=bin_edges[:-1], bins=bin_edges, weights=hist, color='darkblue', label='data')
-    ax.set_xlabel("Data")
+    if format == 'normal': ax.set_xlabel("Data")
+    elif format == 'percent': ax.set_xlabel("Percentages")
     ax.set_ylabel("Frequency")
     ax.legend()
 

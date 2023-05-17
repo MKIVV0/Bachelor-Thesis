@@ -75,9 +75,9 @@ def plot_error_histograms(mu, sigma, epsilon_values: list[float]):
     ith_values3 = list(map(to_percent_format, ith_values3))
 
 
-    plot_histogram(ith_values1, "Numpy.median error histogram", mu1, sigma1)
-    for index in range(len(ith_values2)): plot_histogram(ith_values2[index], "Epsilon-median percentage deviations histogram, ε = {:.2f}".format(epsilon_values[index]), mu2[index], sigma2[index])
-    plot_histogram(ith_values3, "Two-heaps median error histogram", mu3, sigma3)
+    plot_histogram(ith_values1, "Numpy.median error histogram", mu1, sigma1, format='percent')
+    for index in range(len(ith_values2)): plot_histogram(ith_values2[index], "Epsilon-median percentage deviations histogram, ε = {:.2f}".format(epsilon_values[index]), mu2[index], sigma2[index], format='percent')
+    plot_histogram(ith_values3, "Two-heaps median error histogram", mu3, sigma3, format='percent')
     
 # MAIN ENTRY
 def main():
