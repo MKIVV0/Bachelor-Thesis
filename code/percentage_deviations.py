@@ -1,14 +1,27 @@
-from misc import plot_histogram, epsilon_median, read_from_file
+from misc import plot_histogram, epsilon_median, read_from_file, write_to_file
 from numpy import median as numpy_median, sqrt
 import TwoHeaps as th
 import random as rnd
 from matplotlib.pyplot import show as plt_show
 
+
+''' 
+We want to get, for each trial, the index of the element that, given a trend-plot, goes below 1% and 0.1%.
+This method is integrated into get_ith_iteration.
+'''
+def get_indexes(mu, x_i, i):
+    cond1 = 1 #1%
+    cond2 = 0.1 #0.1%
+    if ((x_i/mu) -1) * 100 <= 1:
+        write_to_file(i, "1percent")
+    if ((x_i/mu) - 1) * 100  <= 0.1:
+        write_to_file(i, "1permille")
+
 # Represents ONE median-estimation trial
 # The object parameter is only used when a two-heaps algorithm is passed
 # The median_function parameter is used when only a function is needed for estimating the median
 # it returns the i-th value for each algorithm run
-def get_ith_iteration(mean: float, std: float, num_of_iteration: int, median_function1: float, median_function2: float, epsilon_values: list[float]):
+def get_ith_iteration(mu: float, sigma: float, num_of_iteration: int, median_function1: float, median_function2: float, epsilon_values: list[float]):
     x_i = 0
     tmp_trial_median1: float = 0
     tmp_trial_median2: list[float] = [0.0 for i in range(len(epsilon_values))]
@@ -16,7 +29,7 @@ def get_ith_iteration(mean: float, std: float, num_of_iteration: int, median_fun
     tmp_data = []
     tmp_two_heaps = th.TwoHeaps()
     for i in range(1000):
-        x_i = rnd.normalvariate(mean, std)
+        x_i = rnd.normalvariate(mu, sigma)
         tmp_data.append(x_i)
         tmp_two_heaps.insert(x_i)
         # The epsilon-median is here because it need past values, which
@@ -32,7 +45,7 @@ def get_ith_iteration(mean: float, std: float, num_of_iteration: int, median_fun
     return float(tmp_trial_median1), list(tmp_trial_median2), float(tmp_trial_median3)
 
 
-def plot_error_histograms(mean, std, epsilon_values: list[float]):
+def plot_error_histograms(mu, sigma, epsilon_values: list[float]):
     num_of_trials = 1000
     ith_values1: list[float] = []  # error values for numpy.median
     ith_values2: list[list[float]] = [[] for i in epsilon_values]  # error values for ε-median1
@@ -41,13 +54,13 @@ def plot_error_histograms(mean, std, epsilon_values: list[float]):
     # The other values are thrown away
     for i in range(num_of_trials):
         x, y, z = get_ith_iteration(
-            mean, std, 800, numpy_median, epsilon_median, epsilon_values)
+            mu, sigma, 800, numpy_median, epsilon_median, epsilon_values)
         ith_values1.append(x)
         for index in range(len(ith_values2)):
             ith_values2[index].append(y[index])
         ith_values3.append(z)
 
-    def to_percent_format(x): return (x/mean) - 1
+    def to_percent_format(x): return ((x/mu) - 1) * 100
     ith_values1 = list(map(to_percent_format, ith_values1))
     for index in range(len(ith_values2)):
         ith_values2[index] = list(map(to_percent_format, ith_values2[index]))
