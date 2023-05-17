@@ -1,5 +1,5 @@
 from misc import plot_histogram, epsilon_median, read_from_file, write_to_file
-from numpy import median as numpy_median, sqrt
+from numpy import median as numpy_median, sqrt, mean, std
 import TwoHeaps as th
 import random as rnd
 from matplotlib.pyplot import show as plt_show
@@ -45,6 +45,7 @@ def get_ith_iteration(mu: float, sigma: float, num_of_iteration: int, median_fun
     return float(tmp_trial_median1), list(tmp_trial_median2), float(tmp_trial_median3)
 
 
+# The parameters shown in each plots are locally calculated and are not the known ones
 def plot_error_histograms(mu, sigma, epsilon_values: list[float]):
     num_of_trials = 1000
     ith_values1: list[float] = []  # error values for numpy.median
@@ -60,6 +61,13 @@ def plot_error_histograms(mu, sigma, epsilon_values: list[float]):
             ith_values2[index].append(y[index])
         ith_values3.append(z)
 
+    mu1 = mean(ith_values1)
+    mu2 = [mean(ith_values2[i]) for i in range(len(ith_values2))]
+    mu3 = mean(ith_values3)
+    sigma1 = std(ith_values1)
+    sigma2 = [std(ith_values2[i]) for i in range(len(ith_values2))]
+    sigma3 =  std(ith_values3)
+
     def to_percent_format(x): return ((x/mu) - 1) * 100
     ith_values1 = list(map(to_percent_format, ith_values1))
     for index in range(len(ith_values2)):
@@ -67,9 +75,9 @@ def plot_error_histograms(mu, sigma, epsilon_values: list[float]):
     ith_values3 = list(map(to_percent_format, ith_values3))
 
 
-    plot_histogram(ith_values1, "Numpy.median error histogram")
-    for index in range(len(ith_values2)): plot_histogram(ith_values2[index], "Epsilon-median percentage deviations histogram, ε = {}".format(epsilon_values[index]))
-    plot_histogram(ith_values3, "Two-heaps median error histogram")
+    plot_histogram(ith_values1, "Numpy.median error histogram", mu1, sigma1)
+    for index in range(len(ith_values2)): plot_histogram(ith_values2[index], "Epsilon-median percentage deviations histogram, ε = {:.2f}".format(epsilon_values[index]), mu2[index], sigma2[index])
+    plot_histogram(ith_values3, "Two-heaps median error histogram", mu3, sigma3)
     
 # MAIN ENTRY
 def main():

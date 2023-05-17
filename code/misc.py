@@ -63,9 +63,11 @@ def gaussian(x, a, mu, sigma):
 
 
 # plots the histogram of the random generated data
-def plot_histogram(data, title):
+def plot_histogram(data, title, mu=None, sigma=None):
+    # These parameters are needed for making the gaussian fit
     local_mean = mean(data)
     local_std = std(data)
+        
     # values of the histogram, bin edges (len(hist)+1)
     hist, bin_edges = histogram(data, 25)
     # calculates the bin centers,by taking pairs, summing them and multiply them by .5
@@ -74,9 +76,13 @@ def plot_histogram(data, title):
     # fitting curve function
     popt, pcov = curve_fit(f=gaussian, xdata=bin_centers, ydata=hist, p0=[max(hist), local_mean, local_std])
     #print(popt, '\n', pcov)
+
+    if mu != None and sigma != None:
+        local_mean = mu
+        local_std = sigma
  
     fig, ax = plt.subplots(1, 1)
-    ax.set_title("{}:\nμ: {:.5e}\nσ: {:.5e}".format(
+    ax.set_title("{}:\nμ: {:.2e}\nσ: {:.2e}".format(
         title, local_mean, local_std))
     # plots the fitting line curve
     ax.plot(bin_centers, gaussian(bin_centers, *popt), 'r', label='gaussian fit')
