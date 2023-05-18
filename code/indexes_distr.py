@@ -51,13 +51,13 @@ def plot_k_barplots(k_values, y_values1, y_values2):    # TO REVISE
 
 
     ax[0].set_title("iterations which value go under 0.1%")
-    #ax[0].plot(k_values, iter_means1)
-    ax[0].hist(iter_means1)
+    ax[0].plot(k_values, iter_means1)
+    #ax[0].hist(iter_means1)
     ax[0].set_ylabel("Iteration mean values")
 
     ax[1].set_title("iterations which value go under 0.02%")
-    #ax[1].plot(k_values, iter_means2)
-    ax[1].hist(iter_means2)
+    ax[1].plot(k_values, iter_means2)
+    #ax[1].hist(iter_means2)
     ax[1].set_xlabel("K constants")
     ax[1].set_ylabel("Iteration mean values")
 
@@ -86,6 +86,7 @@ def main():
                 cond1, cond2 = check_index(mu, actual_medians[j])
                 if cond1 == True: one_percent[j].append(i)
                 if cond2 == True: one_permille[j].append(i)
+        actual_medians = [0.0 for i in range(len(epsilons))] # actual medians reset at the end of a story
     
 
     for i in range(len(k_values)):
