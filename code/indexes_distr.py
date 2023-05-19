@@ -73,8 +73,8 @@ def main():
 
 
     # index lists
-    one_percent = [[] for i in range(len(k_values))]
-    one_permille = [[] for i in range(len(k_values))] 
+    first_threshold_values = [[] for i in range(len(k_values))]
+    second_threshold_values = [[] for i in range(len(k_values))] 
 
     for stories in range(1000):
         # simulates a stream of 1000 data (1 story)
@@ -84,16 +84,16 @@ def main():
             for j in range(len(k_values)):
                 actual_medians[j] = epsilon_median(datapoint, epsilons[j], i, actual_medians[j])
                 cond1, cond2 = check_index(mu, actual_medians[j])
-                if cond1 == True: one_percent[j].append(i)
-                if cond2 == True: one_permille[j].append(i)
+                if cond1 == True: first_threshold_values[j].append(i)
+                if cond2 == True: second_threshold_values[j].append(i)
         actual_medians = [0.0 for i in range(len(epsilons))] # actual medians reset at the end of a story
     
 
     for i in range(len(k_values)):
-        plot_data_distribution(one_percent[i], 'Iterations which numbers go below 0.1% for k = {:.0f}, data count = {}'.format(k_values[i], len(one_percent[i])))
-        plot_data_distribution(one_permille[i], 'Iterations which numbers go below 0.02% for k = {:.0f}, data count = {}'.format(k_values[i], len(one_permille[i])))
+        plot_data_distribution(first_threshold_values[i], 'Iterations which numbers go below 0.1% for k = {:.0f}, data count = {}'.format(k_values[i], len(first_threshold_values[i])))
+        plot_data_distribution(second_threshold_values[i], 'Iterations which numbers go below 0.02% for k = {:.0f}, data count = {}'.format(k_values[i], len(second_threshold_values[i])))
 
-    plot_k_barplots(k_values, one_percent, one_permille)
+    plot_k_barplots(k_values, first_threshold_values, second_threshold_values)
 
     plt.show()
 
