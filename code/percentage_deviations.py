@@ -50,14 +50,6 @@ def plot_error_histograms(mu, sigma, epsilon_values: list[float], k_values: list
             ith_values2[index].append(y[index])
         ith_values3.append(z)
 
-    # local mus and sigmas
-    mu1 = mean(ith_values1)
-    mu2 = [mean(ith_values2[i]) for i in range(len(ith_values2))]
-    mu3 = mean(ith_values3)
-    sigma1 = std(ith_values1)
-    sigma2 = [std(ith_values2[i]) for i in range(len(ith_values2))]
-    sigma3 =  std(ith_values3)
-
     def to_percent_format(x): return ((x/mu) - 1) * 100
     ith_values1 = list(map(to_percent_format, ith_values1))
     for index in range(len(ith_values2)):
@@ -65,9 +57,9 @@ def plot_error_histograms(mu, sigma, epsilon_values: list[float], k_values: list
     ith_values3 = list(map(to_percent_format, ith_values3))
 
 
-    plot_histogram(ith_values1, "Numpy.median error histogram", mu1, sigma1, format='percent')
-    for index in range(len(ith_values2)): plot_histogram(ith_values2[index], "Epsilon-median percentage deviations histogram, k = {:.0f}, ε = {:.2f}".format(k_values[index], epsilon_values[index]), mu2[index], sigma2[index], format='percent')
-    plot_histogram(ith_values3, "Two-heaps median error histogram", mu3, sigma3, format='percent')
+    plot_histogram(ith_values1, "Numpy.median error histogram", mean(ith_values1), std(ith_values1), format='percent')
+    for index in range(len(ith_values2)): plot_histogram(ith_values2[index], "Epsilon-median percentage deviations histogram, k = {:.0f}, ε = {:.2f}".format(k_values[index], epsilon_values[index]), mean(ith_values2[index]), std(ith_values2[index]), format='percent')
+    plot_histogram(ith_values3, "Two-heaps median error histogram", mean(ith_values3), std(ith_values3), format='percent')
 
 
 # This method is needed for deserilalizing the values from the file generated_epsilons.txt
