@@ -86,6 +86,18 @@ def main():
                 cond1, cond2 = check_index(mu, actual_medians[j])
                 if cond1 == True: first_threshold_values[j].append(i)
                 if cond2 == True: second_threshold_values[j].append(i)
+
+        '''
+        THE VALUES OF THE GRAPHS ARE CUMULATIVE! ONLY THE EPSILON VALUES ARE RESET TO ZERO AT THE END OF EACH STORY
+        # Here the graphs at the k-th story are plotted
+        # plot graphs
+        for i in range(len(k_values)):
+            plot_data_distribution(first_threshold_values[i], 'Iterations which numbers go below 0.1% for k = {:.0f}, data count = {}'.format(k_values[i], len(first_threshold_values[i])))
+            plot_data_distribution(second_threshold_values[i], 'Iterations which numbers go below 0.02% for k = {:.0f}, data count = {}'.format(k_values[i], len(second_threshold_values[i])))
+        plt.show() # Blocking: the main thread is blocked at this point until all the opened graphs are closed
+        '''
+
+
         actual_medians = [0.0 for i in range(len(epsilons))] # actual medians reset at the end of a story
     
 
